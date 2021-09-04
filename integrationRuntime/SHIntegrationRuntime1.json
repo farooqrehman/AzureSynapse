@@ -1,0 +1,6 @@
+{
+	"name": "SHIntegrationRuntime1",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}

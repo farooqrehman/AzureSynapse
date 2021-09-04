@@ -1,0 +1,19 @@
+{
+	"name": "tripdata_Parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "azure-synapse-fur-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "azuredlfilesystemfur"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
