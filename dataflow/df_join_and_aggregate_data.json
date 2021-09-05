@@ -1,0 +1,42 @@
+{
+	"name": "df_join_and_aggregate_data",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "tripdata_Parquet",
+						"type": "DatasetReference"
+					},
+					"name": "srctripdataparquet"
+				},
+				{
+					"dataset": {
+						"referenceName": "tripfare_Parquet",
+						"type": "DatasetReference"
+					},
+					"name": "srctripfareparquet"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SinkParquet1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "innerjoinwithtripfares"
+				},
+				{
+					"name": "Aggregate1"
+				}
+			],
+			"script": "source(output(\n\t\tmedallion as string,\n\t\thack_license as string,\n\t\tvendor_id as string,\n\t\trate_code as string,\n\t\tstore_and_fwd_flag as string,\n\t\tpickup_datetime as string,\n\t\tdropoff_datetime as string,\n\t\tpassenger_count as string,\n\t\ttrip_time_in_secs as string,\n\t\ttrip_distance as string,\n\t\tpickup_longitude as string,\n\t\tpickup_latitude as string,\n\t\tdropoff_longitude as string,\n\t\tdropoff_latitude as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> srctripdataparquet\nsource(output(\n\t\tmedallion as string,\n\t\thack_license as string,\n\t\tvendor_id as string,\n\t\trate_code as string,\n\t\tstore_and_fwd_flag as string,\n\t\tpickup_datetime as string,\n\t\tdropoff_datetime as string,\n\t\tpassenger_count as string,\n\t\ttrip_time_in_secs as string,\n\t\ttrip_distance as string,\n\t\tpickup_longitude as string,\n\t\tpickup_latitude as string,\n\t\tdropoff_longitude as string,\n\t\tdropoff_latitude as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> srctripfareparquet\nsrctripdataparquet, srctripfareparquet join(srctripdataparquet@medallion == srctripfareparquet@medallion\n\t&& srctripdataparquet@hack_license == srctripfareparquet@hack_license\n\t&& srctripdataparquet@vendor_id == srctripfareparquet@vendor_id\n\t&& srctripdataparquet@pickup_datetime == srctripfareparquet@pickup_datetime,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> innerjoinwithtripfares\ninnerjoinwithtripfares aggregate(groupBy(srctripdataparquet@vendor_id),\n\taverage_fare = countDistinct(srctripdataparquet@rate_code),\n\t\ttotal_trip_distance = sum(toInteger(srctripdataparquet@trip_distance))) ~> Aggregate1\nAggregate1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tmedallion as string,\n\t\thack_license as string,\n\t\tvendor_id as string,\n\t\trate_code as string,\n\t\tstore_and_fwd_flag as string,\n\t\tpickup_datetime as string,\n\t\tdropoff_datetime as string,\n\t\tpassenger_count as string,\n\t\ttrip_time_in_secs as string,\n\t\ttrip_distance as string,\n\t\tpickup_longitude as string,\n\t\tpickup_latitude as string,\n\t\tdropoff_longitude as string,\n\t\tdropoff_latitude as string\n\t),\n\tformat: 'parquet',\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+		}
+	}
+}

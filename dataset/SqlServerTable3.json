@@ -1,0 +1,12 @@
+{
+	"name": "SqlServerTable3",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LHSqlServer1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	}
+}
