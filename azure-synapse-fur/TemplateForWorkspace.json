@@ -31,7 +31,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "copy data from LH SQL Server",
+						"name": "cd_trip_data_from_LH_SQL_Server",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
@@ -81,13 +81,215 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "cd_tripfare_data_from_LH_sql_server",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "cd_trip_data_from_LH_SQL_Server",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SqlServerTable2",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "tripfare_Parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "df_join_and_aggregate_data",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "cd_tripfare_data_from_LH_sql_server",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_join_and_aggregate_data",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"srctripdataparquet": {},
+									"srctripfareparquet": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
 					}
 				],
 				"annotations": []
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/SqlServerTable1')]",
-				"[concat(variables('workspaceId'), '/datasets/tripdata_Parquet')]"
+				"[concat(variables('workspaceId'), '/datasets/tripdata_Parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/SqlServerTable2')]",
+				"[concat(variables('workspaceId'), '/datasets/tripfare_Parquet')]",
+				"[concat(variables('workspaceId'), '/dataflows/df_join_and_aggregate_data')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureSynapseAnalyticsTable1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "azure-synapse-fur-WorkspaceDefaultSqlServer",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"DBName": "SampleSinkDB"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/azure-synapse-fur-WorkspaceDefaultSqlServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SinkParquet1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "azure-synapse-fur-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "azuredlfilesystemfur"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "medallion",
+						"type": "UTF8"
+					},
+					{
+						"name": "hack_license",
+						"type": "UTF8"
+					},
+					{
+						"name": "vendor_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "rate_code",
+						"type": "UTF8"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "passenger_count",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_time_in_secs",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_distance",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_latitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_latitude",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/azure-synapse-fur-WorkspaceDefaultStorage')]"
 			]
 		},
 		{
@@ -169,6 +371,90 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SqlServerTable2')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LHSqlServer1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "medallion",
+						"type": "nvarchar"
+					},
+					{
+						"name": "hack_license",
+						"type": "nvarchar"
+					},
+					{
+						"name": "vendor_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "nvarchar"
+					},
+					{
+						"name": "payment_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "fare_amount",
+						"type": "nvarchar"
+					},
+					{
+						"name": "surcharge",
+						"type": "nvarchar"
+					},
+					{
+						"name": "mta_tax",
+						"type": "nvarchar"
+					},
+					{
+						"name": "tip_amount",
+						"type": "nvarchar"
+					},
+					{
+						"name": "tolls_amount",
+						"type": "nvarchar"
+					},
+					{
+						"name": "total_amount",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "TripFares"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/LHSqlServer1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SqlServerTable3')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LHSqlServer1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/LHSqlServer1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/tripdata_Parquet')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -186,7 +472,145 @@
 					},
 					"compressionCodec": "snappy"
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "medallion",
+						"type": "UTF8"
+					},
+					{
+						"name": "hack_license",
+						"type": "UTF8"
+					},
+					{
+						"name": "vendor_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "rate_code",
+						"type": "UTF8"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "passenger_count",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_time_in_secs",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_distance",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_latitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_latitude",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/azure-synapse-fur-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/tripfare_Parquet')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "azure-synapse-fur-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "azuredlfilesystemfur"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "medallion",
+						"type": "UTF8"
+					},
+					{
+						"name": "hack_license",
+						"type": "UTF8"
+					},
+					{
+						"name": "vendor_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "rate_code",
+						"type": "UTF8"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_datetime",
+						"type": "UTF8"
+					},
+					{
+						"name": "passenger_count",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_time_in_secs",
+						"type": "UTF8"
+					},
+					{
+						"name": "trip_distance",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "pickup_latitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_longitude",
+						"type": "UTF8"
+					},
+					{
+						"name": "dropoff_latitude",
+						"type": "UTF8"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/azure-synapse-fur-WorkspaceDefaultStorage')]"
@@ -282,6 +706,55 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/df_join_and_aggregate_data')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "tripdata_Parquet",
+								"type": "DatasetReference"
+							},
+							"name": "srctripdataparquet"
+						},
+						{
+							"dataset": {
+								"referenceName": "tripfare_Parquet",
+								"type": "DatasetReference"
+							},
+							"name": "srctripfareparquet"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SinkParquet1",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "innerjoinwithtripfares"
+						},
+						{
+							"name": "Aggregate1"
+						}
+					],
+					"script": "source(output(\n\t\tmedallion as string,\n\t\thack_license as string,\n\t\tvendor_id as string,\n\t\trate_code as string,\n\t\tstore_and_fwd_flag as string,\n\t\tpickup_datetime as string,\n\t\tdropoff_datetime as string,\n\t\tpassenger_count as string,\n\t\ttrip_time_in_secs as string,\n\t\ttrip_distance as string,\n\t\tpickup_longitude as string,\n\t\tpickup_latitude as string,\n\t\tdropoff_longitude as string,\n\t\tdropoff_latitude as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> srctripdataparquet\nsource(output(\n\t\tmedallion as string,\n\t\thack_license as string,\n\t\tvendor_id as string,\n\t\trate_code as string,\n\t\tstore_and_fwd_flag as string,\n\t\tpickup_datetime as string,\n\t\tdropoff_datetime as string,\n\t\tpassenger_count as string,\n\t\ttrip_time_in_secs as string,\n\t\ttrip_distance as string,\n\t\tpickup_longitude as string,\n\t\tpickup_latitude as string,\n\t\tdropoff_longitude as string,\n\t\tdropoff_latitude as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> srctripfareparquet\nsrctripdataparquet, srctripfareparquet join(srctripdataparquet@medallion == srctripfareparquet@medallion\n\t&& srctripdataparquet@hack_license == srctripfareparquet@hack_license\n\t&& srctripdataparquet@vendor_id == srctripfareparquet@vendor_id\n\t&& srctripdataparquet@pickup_datetime == srctripfareparquet@pickup_datetime,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> innerjoinwithtripfares\ninnerjoinwithtripfares aggregate(groupBy(srctripdataparquet@vendor_id),\n\taverage_fare = countDistinct(srctripdataparquet@rate_code),\n\t\ttotal_trip_distance = sum(toInteger(srctripdataparquet@trip_distance))) ~> Aggregate1\nAggregate1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tmedallion as string,\n\t\thack_license as string,\n\t\tvendor_id as string,\n\t\trate_code as string,\n\t\tstore_and_fwd_flag as string,\n\t\tpickup_datetime as string,\n\t\tdropoff_datetime as string,\n\t\tpassenger_count as string,\n\t\ttrip_time_in_secs as string,\n\t\ttrip_distance as string,\n\t\tpickup_longitude as string,\n\t\tpickup_latitude as string,\n\t\tdropoff_longitude as string,\n\t\tdropoff_latitude as string\n\t),\n\tformat: 'parquet',\n\tumask: 0022,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/tripdata_Parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/tripfare_Parquet')]",
+				"[concat(variables('workspaceId'), '/datasets/SinkParquet1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
