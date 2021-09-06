@@ -1,0 +1,14 @@
+{
+	"name": "serverlessSQLpool",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDW",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=azure-synapse-fur-ondemand.sql.azuresynapse.net;Initial Catalog=sls_SQLdb"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
