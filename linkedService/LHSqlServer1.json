@@ -5,8 +5,8 @@
 		"annotations": [],
 		"type": "SqlServer",
 		"typeProperties": {
-			"connectionString": "integrated security=False;data source=DESKTOP-EEPNC4F;initial catalog=taxi-data;user id=sa",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJlNDBiNDJiZS0wYzQzLTQwZGQtOGNmMy02OGUyYzUwYzM2NmEiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"connectionString": "integrated security=False;data source=DESKTOP-EEPNC4F;initial catalog=AdventureWorksDW2019;user id=sa",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJhY2Q3NzFlMi1mZDI2LTQ1MTMtODAzNS0wM2NhOTFhYTE2ZGUiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "SHIntegrationRuntime1",
