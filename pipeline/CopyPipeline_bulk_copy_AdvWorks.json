@@ -1,0 +1,337 @@
+{
+	"name": "CopyPipeline_bulk_copy_AdvWorks",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach_9ne",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.cw_items",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy_9ne",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [
+								{
+									"name": "Source",
+									"value": "dbo.@{item().source.table}"
+								},
+								{
+									"name": "Destination",
+									"value": "dbo.@{item().destination.table}"
+								}
+							],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"tableOption": "autoCreate"
+								},
+								"enableStaging": false,
+								"validateDataConsistency": false
+							},
+							"inputs": [
+								{
+									"referenceName": "SourceDataset_9ne",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_table": "@item().source.table"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DestinationDataset_9ne",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_table": "@item().destination.table"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"cw_items": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"source": {
+							"table": "AdventureWorksDWBuildVersion"
+						},
+						"destination": {
+							"table": "AdventureWorksDWBuildVersion"
+						}
+					},
+					{
+						"source": {
+							"table": "AnalysisReport"
+						},
+						"destination": {
+							"table": "AnalysisReport"
+						}
+					},
+					{
+						"source": {
+							"table": "DatabaseLog"
+						},
+						"destination": {
+							"table": "DatabaseLog"
+						}
+					},
+					{
+						"source": {
+							"table": "DimAccount"
+						},
+						"destination": {
+							"table": "DimAccount"
+						}
+					},
+					{
+						"source": {
+							"table": "DimCurrency"
+						},
+						"destination": {
+							"table": "DimCurrency"
+						}
+					},
+					{
+						"source": {
+							"table": "DimCustomer"
+						},
+						"destination": {
+							"table": "DimCustomer"
+						}
+					},
+					{
+						"source": {
+							"table": "DimDate"
+						},
+						"destination": {
+							"table": "DimDate"
+						}
+					},
+					{
+						"source": {
+							"table": "DimDepartmentGroup"
+						},
+						"destination": {
+							"table": "DimDepartmentGroup"
+						}
+					},
+					{
+						"source": {
+							"table": "DimEmployee"
+						},
+						"destination": {
+							"table": "DimEmployee"
+						}
+					},
+					{
+						"source": {
+							"table": "DimGeography"
+						},
+						"destination": {
+							"table": "DimGeography"
+						}
+					},
+					{
+						"source": {
+							"table": "DimOrganization"
+						},
+						"destination": {
+							"table": "DimOrganization"
+						}
+					},
+					{
+						"source": {
+							"table": "DimProduct"
+						},
+						"destination": {
+							"table": "DimProduct"
+						}
+					},
+					{
+						"source": {
+							"table": "DimProductCategory"
+						},
+						"destination": {
+							"table": "DimProductCategory"
+						}
+					},
+					{
+						"source": {
+							"table": "DimProductSubcategory"
+						},
+						"destination": {
+							"table": "DimProductSubcategory"
+						}
+					},
+					{
+						"source": {
+							"table": "DimPromotion"
+						},
+						"destination": {
+							"table": "DimPromotion"
+						}
+					},
+					{
+						"source": {
+							"table": "DimReseller"
+						},
+						"destination": {
+							"table": "DimReseller"
+						}
+					},
+					{
+						"source": {
+							"table": "DimSalesReason"
+						},
+						"destination": {
+							"table": "DimSalesReason"
+						}
+					},
+					{
+						"source": {
+							"table": "DimSalesTerritory"
+						},
+						"destination": {
+							"table": "DimSalesTerritory"
+						}
+					},
+					{
+						"source": {
+							"table": "DimScenario"
+						},
+						"destination": {
+							"table": "DimScenario"
+						}
+					},
+					{
+						"source": {
+							"table": "FactAdditionalInternationalProductDescription"
+						},
+						"destination": {
+							"table": "FactAdditionalInternationalProductDescription"
+						}
+					},
+					{
+						"source": {
+							"table": "FactCallCenter"
+						},
+						"destination": {
+							"table": "FactCallCenter"
+						}
+					},
+					{
+						"source": {
+							"table": "FactCurrencyRate"
+						},
+						"destination": {
+							"table": "FactCurrencyRate"
+						}
+					},
+					{
+						"source": {
+							"table": "FactFinance"
+						},
+						"destination": {
+							"table": "FactFinance"
+						}
+					},
+					{
+						"source": {
+							"table": "FactInternetSales"
+						},
+						"destination": {
+							"table": "FactInternetSales"
+						}
+					},
+					{
+						"source": {
+							"table": "FactInternetSalesReason"
+						},
+						"destination": {
+							"table": "FactInternetSalesReason"
+						}
+					},
+					{
+						"source": {
+							"table": "FactProductInventory"
+						},
+						"destination": {
+							"table": "FactProductInventory"
+						}
+					},
+					{
+						"source": {
+							"table": "FactResellerSales"
+						},
+						"destination": {
+							"table": "FactResellerSales"
+						}
+					},
+					{
+						"source": {
+							"table": "FactSalesQuota"
+						},
+						"destination": {
+							"table": "FactSalesQuota"
+						}
+					},
+					{
+						"source": {
+							"table": "FactSurveyResponse"
+						},
+						"destination": {
+							"table": "FactSurveyResponse"
+						}
+					},
+					{
+						"source": {
+							"table": "NewFactCurrencyRate"
+						},
+						"destination": {
+							"table": "NewFactCurrencyRate"
+						}
+					},
+					{
+						"source": {
+							"table": "ProspectiveBuyer"
+						},
+						"destination": {
+							"table": "ProspectiveBuyer"
+						}
+					},
+					{
+						"source": {
+							"table": "sysdiagrams"
+						},
+						"destination": {
+							"table": "sysdiagrams"
+						}
+					}
+				]
+			}
+		},
+		"annotations": []
+	}
+}
