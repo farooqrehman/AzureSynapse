@@ -62,7 +62,7 @@
 					"df = spark.read.load('abfss://azuredlfilesystemfur@azuredatalakegen2fur.dfs.core.windows.net/dbo.TripData.parquet', format='parquet')\r\n",
 					"display(df.limit(10))"
 				],
-				"execution_count": 1
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -83,10 +83,54 @@
 				},
 				"source": [
 					"%%spark\r\n",
-					"val scalaDataFrame = spark.read.sqlanalytics(\"DedicatedSQLPool1.dbo.DimCustomer\")\r\n",
-					"scalaDataFrame.createOrReplaceTempView( \"tempDimCustomer\" )"
+					"val scalaDataFrame = spark.read.sqlanalytics(\"DedicatedSQLPool1.dbo.DimCurrency1\")\r\n",
+					"scalaDataFrame.createOrReplaceTempView( \"DimCurrency11\" )\r\n",
+					"scalaDataFrame.show(10)"
 				],
-				"execution_count": 2
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "python"
+					},
+					"collapsed": true
+				},
+				"source": [
+					"%%pyspark\r\n",
+					"myNewPythonDataFrame = spark.sql(\"SELECT * FROM DimCurrency11\")\r\n",
+					""
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"myNewPythonDataFrame.show()"
+				],
+				"execution_count": 10
 			}
 		]
 	}

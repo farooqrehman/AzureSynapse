@@ -56,7 +56,9 @@
 				"source": [
 					"%%spark\r\n",
 					"val scalaDataFrame = spark.read.sqlanalytics(\"DedicatedSQLPool1.dbo.DimCustomer\")\r\n",
-					"scalaDataFrame.createOrReplaceTempView( \"tempDimCustomer\" )"
+					"scalaDataFrame.createOrReplaceTempView( \"tempDimCustomer\" )\r\n",
+					"\r\n",
+					"df.write.synapsesql(\"DedicatedSQLPool1.dbo.TripData\",Constants.INTERNAL)"
 				],
 				"execution_count": 2
 			},
