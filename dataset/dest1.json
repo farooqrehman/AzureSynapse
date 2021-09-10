@@ -1,0 +1,18 @@
+{
+	"name": "dest1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "azure-synapse-fur-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "sample",
+				"fileSystem": "azuredlfilesystemfur"
+			}
+		}
+	}
+}

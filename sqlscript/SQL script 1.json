@@ -2,13 +2,13 @@
 	"name": "SQL script 1",
 	"properties": {
 		"content": {
-			"query": "select top 10 * \nfrom openrowset(\n    bulk 'https://pandemicdatalake.blob.core.windows.net/public/curated/covid-19/ecdc_cases/latest/ecdc_cases.parquet', \n    format = 'parquet') as rows\n\nselect top 10 * \nfrom openrowset(\n    bulk 'https://azuredatalakegen2fur.dfs.core.windows.net/azuredlfilesystemfur/dbo.TripData.parquet',\n    format = 'parquet') as rows",
+			"query": "DBCC PDW_SHOWSPACEUSED('dbo.FactInternetSales');",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
-				"poolName": "Built-in"
+				"databaseName": "DedicatedSQLPool1",
+				"poolName": "DedicatedSQLPool1"
 			},
 			"resultLimit": 5000
 		},
