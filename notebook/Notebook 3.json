@@ -1,5 +1,5 @@
 {
-	"name": "Notebook 1",
+	"name": "Notebook 3",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -53,65 +53,17 @@
 						"language": "python"
 					},
 					"jupyter": {
-						"outputs_hidden": false
+						"outputs_hidden": true
 					},
 					"collapsed": false
 				},
 				"source": [
 					"%%pyspark\r\n",
-					"df = spark.read.load('abfss://azuredlfilesystemfur@azuredatalakegen2fur.dfs.core.windows.net/dbo.TripData.parquet', format='parquet')\r\n",
+					"df = spark.read.load('abfss://azuredlfilesystemfur@azuredatalakegen2fur.dfs.core.windows.net/sample/dbo.TripData.parquet', format='parquet')\r\n",
+					"\r\n",
 					"display(df.limit(10))"
 				],
-				"execution_count": 24
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					},
-					"microsoft": {
-						"language": "scala"
-					},
-					"collapsed": true
-				},
-				"source": [
-					"%%spark\r\n",
-					"val scalaDataFrame = spark.read.sqlanalytics(\"DedicatedSQLPool1.dbo.DimCurrency1\")\r\n",
-					"scalaDataFrame.createOrReplaceTempView( \"DimCurrency11\" )\r\n",
-					"scalaDataFrame.show(10)"
-				],
-				"execution_count": null
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					},
-					"microsoft": {
-						"language": "python"
-					},
-					"collapsed": true
-				},
-				"source": [
-					"%%pyspark\r\n",
-					"myNewPythonDataFrame = spark.sql(\"SELECT * FROM DimCurrency11\")\r\n",
-					""
-				],
-				"execution_count": 9
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -128,9 +80,9 @@
 					"collapsed": true
 				},
 				"source": [
-					"myNewPythonDataFrame.show()"
+					"df.printSchema()"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
@@ -144,17 +96,22 @@
 							"deleting": false
 						}
 					},
-					"microsoft": {
-						"language": "python"
-					},
-					"collapsed": true
+					"collapsed": false
 				},
 				"source": [
-					"%%pyspark\r\n",
-					"df1 = spark.read.load('abfss://azuredlfilesystemfur@azuredatalakegen2fur.dfs.core.windows.net/azuredlfilesystemfur/sample/dbo.TripData.parquet', format='parquet')\r\n",
-					"display(df1.limit(10))"
+					"from pyspark.sql import SparkSession\r\n",
+					"from pyspark.sql.types import *\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"profitByDateProduct = (df.groupBy(\"medallion\",\"vendor_id\")\r\n",
+					"    .agg(\r\n",
+					"        sum(\"trip_distance\").alias(\"(sum)trip_distance\"),\r\n",
+					"        round(avg(\"passenger_count\"), 4).alias(\"(avg)passenger_count\"),\r\n",
+					"        sum(\"passenger_count\").alias(\"(sum)passenger_count\"))\r\n",
+					"    .orderBy(\"medallion\"))\r\n",
+					"display(profitByDateProduct.limit(100))"
 				],
-				"execution_count": 23
+				"execution_count": 6
 			}
 		]
 	}
